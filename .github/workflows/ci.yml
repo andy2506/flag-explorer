@@ -1,0 +1,61 @@
+name: Flag Explorer CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18]
+
+    steps:
+      - name: ⬇Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # ================== BACKEND ==================
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: npm install
+
+      - name: Run backend tests
+        working-directory: ./backend
+        run: npm test
+
+      # ================== FRONTEND ==================
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: npm install
+
+      - name: Run frontend tests
+        working-directory: ./frontend
+        run: npm test
+
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build
+
+      # ================== PACKAGE ==================
+      - name: Package app
+        run: |
+          mkdir -p packaged/frontend
+          mkdir -p packaged/backend
+          cp -r frontend/.next frontend/public frontend/package.json packaged/frontend/
+          cp -r backend packaged/backend/
+          echo "Frontend and Backend packaged for deployment."
+
+      - name: Upload packaged artifacts (optional)
+        uses: actions/upload-artifact@v3
+        with:
+          name: flag-explorer-artifacts
+          path: packaged/
