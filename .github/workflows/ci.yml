@@ -15,7 +15,7 @@ jobs:
         node-version: [18]
 
     steps:
-      - name: ⬇Checkout repository
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Setup Node.js
@@ -53,9 +53,3 @@ jobs:
           cp -r frontend/.next frontend/public frontend/package.json packaged/frontend/
           cp -r backend packaged/backend/
           echo "Frontend and Backend packaged for deployment."
-
-      - name: Upload packaged artifacts (optional)
-        uses: actions/upload-artifact@v3
-        with:
-          name: flag-explorer-artifacts
-          path: packaged/
